@@ -34,7 +34,7 @@
                                 <td>{{ $key + 1 }}</td>
                                 <td>{{ $item->category_name }}</td>
                                 <td>
-                                    <form action="{{ route('category.destroy', $item->id) }}" method="POST"onsubmit="return confirm('Yakin ingin menghapus?')">
+                                    <form action="{{ route('admin.category.destroy', $item->id) }}" method="POST"onsubmit="return confirm('Yakin ingin menghapus?')">
                                         @csrf
                                         @method('DELETE')
 
@@ -65,7 +65,7 @@
                 </button>
             </div>
 
-            <form action="{{ route('category.store') }}" method="POST">
+            <form action="{{ route('admin.category.store') }}" method="POST">
                 @csrf
 
                 <div class="modal-body">

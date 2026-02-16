@@ -6,13 +6,19 @@ use App\Http\Controllers\FrontController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderController;
-
+use App\Http\Controllers\CustomerController;
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
+// Halaman utama portal
 Route::get('/', [FrontController::class, 'index'])->name('home-page');
 
-
+// Autentikasi
 Route::controller(LoginController::class)->group(function () {
     Route::get('/login', 'index')->name('login');
     Route::post('/login', 'login');
@@ -23,30 +29,43 @@ Route::controller(RegisterController::class)->group(function () {
     Route::post('/register', 'register');
 });
 
+// Route untuk customer yang sudah login
 Route::middleware('auth')->group(function () {
+    // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    
+    // Proses pemesanan
+    Route::post('/order/process', [FrontController::class, 'store'])->name('marketplace.order.process');
+    
+    // Profil customer
+    Route::get('/profile', [CustomerController::class, 'profile'])->name('customer.profile');
+    
+    // Riwayat pesanan customer
+    Route::get('/my-orders', [CustomerController::class, 'orders'])->name('customer.orders');
 });
 
-Route::middleware('auth')->prefix('admin')->group(function () {
-    // Admin Route
+// Route ADMIN - HANYA untuk admin
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard Admin
     Route::get('/', function () {
         return view('pages.home');
-    })->name('admin.dashboard');
+    })->name('dashboard');
 
+    // Manajemen Produk
     Route::resource('product', ProductController::class);
-
-    //route category
+    
+    // Manajemen Kategori
     Route::resource('category', CategoryController::class);
-
-    //route order sisi admin
-    Route::get('/orders', [OrderController::class, 'index'])->name('admin.orders');
-
-    //route stock
-    Route::get('/stock', [ProductController::class, 'stockIndex'])->name('admin.stock');
-    Route::post('/stock/update/{id}', [ProductController::class, 'updateStock'])->name('admin.stock.update');
-
-
+    
+    // Manajemen Pesanan
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+    
+    // Manajemen Stok
+    Route::get('/stock', [ProductController::class, 'stockIndex'])->name('stock');
+    Route::post('/stock/update/{id}', [ProductController::class, 'updateStock'])->name('stock.update');
 });
 
-//route simpan pesanan dari front ke database
-Route::post('/order/process', [FrontController::class, 'store'])->name('marketplace.order.process');
+// Route fallback
+Route::fallback(function () {
+    return redirect()->route('home-page');
+});

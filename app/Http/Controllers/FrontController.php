@@ -3,95 +3,69 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Order;
 use App\Models\Product;
-
+use App\Models\Order;
+use Illuminate\Support\Facades\Auth;
 
 class FrontController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan halaman utama marketplace
      */
     public function index()
     {
-     // Mengambil semua produk beserta kategorinya agar tidak error
-        $products = Product::with('category')->get();
-
-        // Mengirimkan variable $products ke view
+        $products = Product::with('category')->latest()->get();
         return view('pages.front.index', compact('products'));
-
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Memproses pesanan dari customer
      */
     public function store(Request $request)
     {
+        // Cek login
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silakan login untuk memesan produk!');
+        }
+
+        // Validasi
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'name' => 'required|string',
-            'email' => 'required|email',
-            'address' => 'required',
-            'total_item' => 'required|numeric|min:1',
+            'address' => 'required|string|min:10',
+            'total_item' => 'required|integer|min:1',
+            'notes' => 'nullable|string',
         ]);
 
-        $product = \App\Models\Product::findOrFail($request->product_id);
+        // Ambil produk
+        $product = Product::findOrFail($request->product_id);
 
-        // 1. Simpan ke tabel order 
+        // Cek stok
+        if ($product->stock <= 0) {
+            return back()->with('error', 'Maaf, stok produk habis!');
+        }
+
+        if ($request->total_item > $product->stock) {
+            return back()->with('error', 'Stok tidak cukup. Tersedia: ' . $product->stock);
+        }
+
+        // Hitung total
+        $total_price = $product->price * $request->total_item;
+
+        // Simpan order
         Order::create([
-            'product_id' => $product->id,
-            'name' => $request->name,
-            'email' => $request->email,
+            'product_id' => $request->product_id,
+            'name' => Auth::user()->name,
+            'email' => Auth::user()->email,
             'address' => $request->address,
             'notes' => $request->notes,
             'total_item' => $request->total_item,
-            'total_price' => $product->price * $request->total_item,
+            'total_price' => $total_price,
         ]);
 
-        // 2. LOGIKA PENTING: Kurangi stok produk secara otomatis
-        $product->decrement('stock', $request->total_item);
+        // Kurangi stok
+        $product->stock -= $request->total_item;
+        $product->save();
 
-        return redirect()->back()->with('success', 'Pesanan Anda berhasil diproses!');
-    }
-
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return back()->with('success', 'Pesanan berhasil diproses!');
     }
 }

@@ -22,9 +22,15 @@ class Order extends Model
         'total_price',
     ];
 
-    // Relasi ke Product untuk menampilkan nama produk di tabel admin 
+    // Relasi ke Product
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id');
+    }
+
+    // Relasi ke User (jika ada tabel users)
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'email', 'email');
     }
 }

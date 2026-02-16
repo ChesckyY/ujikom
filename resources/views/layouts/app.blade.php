@@ -1,135 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AdminLTE 3 | Dashboard</title>
-
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
+    <title>Admin Dashboard - @yield('title', 'Dashboard')</title>
+    
     <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="{{ asset("plugins/fontawesome-free/css/all.min.css")}}">
-    <!-- Ionicons -->
-    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <!-- Tempusdominus Bootstrap 4 -->
-    <link rel="stylesheet" href="{{ asset("plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css")}}">
-    <!-- iCheck -->
-    <link rel="stylesheet" href="{{ asset("plugins/icheck-bootstrap/icheck-bootstrap.min.css")}}">
-    <!-- JQVMap -->
-    <link rel="stylesheet" href="{{ asset("plugins/jqvmap/jqvmap.min.css")}}">
+    <link rel="stylesheet" href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
     <!-- Theme style -->
-    <link rel="stylesheet" href="{{ asset("dist/css/adminlte.min.css")}}">
-    <!-- overlayScrollbars -->
-    <link rel="stylesheet" href="{{ asset("plugins/overlayScrollbars/css/OverlayScrollbars.min.css")}}">
-    <!-- Daterange picker -->
-    <link rel="stylesheet" href="{{ asset("plugins/daterangepicker/daterangepicker.css")}}">
-    <!-- summernote -->
-    <link rel="stylesheet" href="{{ asset("plugins/summernote/summernote-bs4.min.css")}}">
+    <link rel="stylesheet" href="{{ asset('dist/css/adminlte.min.css') }}">
     <!-- DataTables -->
-    <link rel="stylesheet" href="{{ asset("plugins/datatables-bs4/css/dataTables.bootstrap4.min.css")}}">
-    <link rel="stylesheet" href="{{ asset("plugins/datatables-responsive/css/responsive.bootstrap4.min.css")}}">
-    <link rel="stylesheet" href="{{ asset("plugins/datatables-buttons/css/buttons.bootstrap4.min.css")}}">
+    <link rel="stylesheet" href="{{ asset('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+    @stack('styles')
 </head>
-
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini">
     <div class="wrapper">
-
-        <!-- Preloader -->
-        <div class="preloader flex-column justify-content-center align-items-center">
-            <img class="animation__shake" src="{{asset("")}}dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
-        </div>
-
         <!-- Navbar -->
-        @include('includes.navbar')
-        <!-- /.navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+            </ul>
+            
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a href="{{ route('home-page') }}" class="nav-link">
+                        <i class="fas fa-store"></i> Marketplace
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-link nav-link">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
 
         <!-- Main Sidebar Container -->
         @include('includes.sidebar')
 
-        <!-- Content Wrapper. Contains page content -->
+        <!-- Content Wrapper -->
         <div class="content-wrapper">
-            @yield('content')
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>@yield('title', 'Dashboard')</h1>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <h5><i class="icon fas fa-check"></i> Sukses!</h5>
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <h5><i class="icon fas fa-ban"></i> Error!</h5>
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
+                    @yield('content')
+                </div>
+            </section>
         </div>
-        <!-- /.content-wrapper -->
-        @include('includes.footer')
 
-        <!-- Control Sidebar -->
-        <aside class="control-sidebar control-sidebar-dark">
-            <!-- Control sidebar content goes here -->
-        </aside>
-        <!-- /.control-sidebar -->
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="float-right d-none d-sm-block">
+                <b>Version</b> 1.0.0
+            </div>
+            <strong>Copyright &copy; {{ date('Y') }} Marketplace.</strong> All rights reserved.
+        </footer>
     </div>
-    <!-- ./wrapper -->
 
-    <!-- jQuery -->
-    <script src="{{ asset("plugins/jquery/jquery.min.js")}}"></script>
-    <!-- jQuery UI 1.11.4 -->
-    <script src="{{ asset("plugins/jquery-ui/jquery-ui.min.js")}}"></script>
-    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-    <script>
-        $.widget.bridge('uibutton', $.ui.button)
-
-    </script>
-    <!-- Bootstrap 4 -->
-    <script src="{{ asset("plugins/bootstrap/js/bootstrap.bundle.min.js")}}"></script>
-    <!-- ChartJS -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    {{-- <script src="{{ asset("plugins/chart.js/Chart.min.js")}}"></script> --}}
-    <!-- Sparkline -->
-    <script src="{{ asset("plugins/sparklines/sparkline.js")}}"></script>
-    <!-- JQVMap -->
-    <script src="{{ asset("plugins/jqvmap/jquery.vmap.min.js")}}"></script>
-    <script src="{{ asset("plugins/jqvmap/maps/jquery.vmap.usa.js")}}"></script>
-    <!-- jQuery Knob Chart -->
-    <script src="{{ asset("plugins/jquery-knob/jquery.knob.min.js")}}"></script>
-    <!-- daterangepicker -->
-    <script src="{{ asset("plugins/moment/moment.min.js")}}"></script>
-    <script src="{{ asset("plugins/daterangepicker/daterangepicker.js")}}"></script>
-    <!-- Tempusdominus Bootstrap 4 -->
-    <script src="{{ asset("plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js")}}"></script>
-    <!-- Summernote -->
-    <script src="{{ asset("plugins/summernote/summernote-bs4.min.js")}}"></script>
-    <!-- overlayScrollbars -->
-    <script src="{{ asset("plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js")}}"></script>
-    <!-- AdminLTE App -->
-    <script src="{{ asset("dist/js/adminlte.js")}}"></script>
-    <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-    <script src="{{ asset("dist/js/pages/dashboard.js")}}"></script>
-
-    <!-- DataTables  & Plugins -->
-    <script src="{{ asset('plugins/datatables/jquery.dataTables.min.js')}}"></script>
-    <script src="{{ asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
-    <script src="{{ asset('plugins/datatables-responsive/js/dataTables.responsive.min.js')}}"></script>
-    <script src="{{ asset('plugins/datatables-responsive/js/responsive.bootstrap4.min.js')}}"></script>
-    <script src="{{ asset('plugins/datatables-buttons/js/dataTables.buttons.min.js')}}"></script>
-    <script src="{{ asset('plugins/datatables-buttons/js/buttons.bootstrap4.min.js')}}"></script>
-    <script src="{{ asset('plugins/jszip/jszip.min.js')}}"></script>
-    <script src="{{ asset('plugins/pdfmake/pdfmake.min.js')}}"></script>
-    <script src="{{ asset('plugins/pdfmake/vfs_fonts.js')}}"></script>
-    <script src="{{ asset('plugins/datatables-buttons/js/buttons.html5.min.js')}}"></script>
-    <script src="{{ asset('plugins/datatables-buttons/js/buttons.print.min.js')}}"></script>
-    <script src="{{ asset('plugins/datatables-buttons/js/buttons.colVis.min.js')}}"></script>
+    <!-- Scripts -->
+    <script src="{{ asset('plugins/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('dist/js/adminlte.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
+    
     <script>
         $(function () {
-
             $('.myTable').DataTable({
                 "paging": true,
-                "lengthChange": false,
-                "searching": false,
+                "lengthChange": true,
+                "searching": true,
                 "ordering": true,
                 "info": true,
                 "autoWidth": false,
                 "responsive": true,
             });
         });
-
     </script>
-    @yield('scripts')
-
-  </body>
-
+    
+    @stack('scripts')
+</body>
 </html>
